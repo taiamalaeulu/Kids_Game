@@ -11,6 +11,19 @@
     .choice-btn:hover { transform:scale(1.1); box-shadow:0 5px 15px rgba(0,0,0,0.3);}
     #itemImg { width:200px; height:200px; object-fit:cover; border-radius:20px; box-shadow:0 5px 15px rgba(0,0,0,0.2); margin:0 auto 20px auto; display:block; border:3px solid #f0f0f0; }
     #result{ font-size:24px; font-weight:bold; margin-top:20px;}
+    #choicesContainer{ display:flex; flex-wrap:wrap; justify-content:center; margin-bottom:20px;}<!DOCTYPE html>
+<html>
+<head>
+  <title>Fun Guessing Games!</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Fredoka One', cursive; text-align:center; background:linear-gradient(135deg, #FFD194, #D191FF); margin:0; padding:0;}
+    .game-container { max-width:700px; margin:40px auto; background:white; border-radius:25px; padding:30px; box-shadow:0 10px 25px rgba(0,0,0,0.2); border:10px solid #FF6F61; position:relative;}
+    h2{ font-size:32px; margin-bottom:20px;}
+    .choice-btn { padding:14px 24px; font-size:18px; cursor:pointer; margin:5px; border-radius:15px; border:none; color:white; font-weight:bold; transition:transform 0.2s, box-shadow 0.2s;}
+    .choice-btn:hover { transform:scale(1.1); box-shadow:0 5px 15px rgba(0,0,0,0.3);}
+    #itemImg { width:200px; height:200px; object-fit:cover; border-radius:20px; box-shadow:0 5px 15px rgba(0,0,0,0.2); margin:0 auto 20px auto; display:block; border:3px solid #f0f0f0; }
+    #result{ font-size:24px; font-weight:bold; margin-top:20px;}
     #choicesContainer{ display:flex; flex-wrap:wrap; justify-content:center; margin-bottom:20px;}
     .score-board{ margin-top:20px; font-size:18px; text-align:left;}
     .player-container{ margin-bottom:20px;}
@@ -222,3 +235,215 @@ function restartGame(){
 </script>
 </body>
 </html>
+
+    .score-board{ margin-top:20px; font-size:18px; text-align:left;}
+    .player-container{ margin-bottom:20px;}
+    #homeBtn, #restartBtn{ margin-top:15px; }
+    #bgSelect button{ margin:5px; }
+  </style>
+</head>
+<body>
+
+<div class="game-container">
+  <h2>🎲 Fun Guessing Games! 🎲</h2>
+
+  <div id="bgSelect">
+    <p>Select Background Music:</p>
+    <button class="choice-btn" style="background:#FF6F61;" onclick="selectBg('kids')">🎵 Kids Game Loop</button>
+    <button class="choice-btn" style="background:#6B5B95;" onclick="selectBg('video')">🎵 Video Game Loop</button>
+    <button class="choice-btn" style="background:#FFB347;" onclick="selectBg('retro')">🎵 Retro Loop</button>
+  </div>
+
+  <button id="homeBtn" class="choice-btn" style="background:#FFA500; display:none;" onclick="goHome()">🏠 Home</button>
+  <button id="restartBtn" class="choice-btn" style="background:#4CAF50; display:none;" onclick="restartGame()">🔄 Restart</button>
+
+  <div id="gameSelection" style="display:none;">
+    <p>Select a game to play:</p>
+    <button class="choice-btn" style="background:#FF6F61;" onclick="selectGame('wild')">Guess the Wild Animal</button>
+    <button class="choice-btn" style="background:#6B5B95;" onclick="selectGame('fruit')">Guess the Fruit/Vegetable</button>
+    <button class="choice-btn" style="background:#FFB347;" onclick="selectGame('dinosaur')">Guess the Dinosaur</button>
+  </div>
+
+  <div class="player-container" id="playerSetup" style="display:none;">
+    <p>Enter player names (comma separated):</p>
+    <input type="text" id="playerNames" placeholder="Player1, Player2, ...">
+    <button onclick="startGame()" class="choice-btn" style="background:#FF6F61;">Start Game</button>
+  </div>
+
+  <div id="gameArea" style="display:none;">
+    <p>Current Player: <span id="currentPlayer"></span></p>
+    <img id="itemImg" src="" alt="Item Image" style="display:none;">
+    <div id="choicesContainer"></div>
+    <p id="result"></p>
+    <div class="score-board" id="scoreBoard"></div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/js-confetti@latest/dist/js-confetti.browser.js"></script>
+<script>
+const jsConfetti = new JSConfetti();
+
+// Correct/Wrong Sounds
+const correctSound = new Audio("https://orangefreesounds.com/wp-content/uploads/2022/01/correct-chime.mp3");
+const wrongSound   = new Audio("https://orangefreesounds.com/wp-content/uploads/2015/08/Ding-small-bell.mp3");
+
+// Background Music Options
+let bgMusic = new Audio();
+bgMusic.loop = true;
+bgMusic.volume = 0.2;
+
+function selectBg(option){
+  if(!bgMusic.paused) bgMusic.pause();
+  switch(option){
+    case 'kids':
+      bgMusic.src = "https://orangefreesounds.com/wp-content/uploads/2023/02/Kids-game-music-loop.mp3";
+      break;
+    case 'video':
+      bgMusic.src = "https://orangefreesounds.com/wp-content/uploads/2020/10/Loop-music-for-video-game.mp3";
+      break;
+    case 'retro':
+      bgMusic.src = "https://orangefreesounds.com/wp-content/uploads/2020/10/Vintage-retro-background-music.mp3";
+      break;
+  }
+  bgMusic.play();
+  document.getElementById("bgSelect").style.display="none";
+  document.getElementById("gameSelection").style.display="block";
+}
+
+const winningScore = 5;
+
+const wildAnimals = [
+  { name:"Cat", img:"https://upload.wikimedia.org/wikipedia/commons/4/4d/Cat_November_2010-1a.jpg" },
+  { name:"Dog", img:"https://upload.wikimedia.org/wikipedia/commons/d/d9/Collage_of_Nine_Dogs.jpg" },
+  { name:"Lion", img:"https://images.unsplash.com/photo-1592194996308-7b43878e84a6?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=60" },
+  { name:"Tiger", img:"https://transforms.stlzoo.org/production/animals/amur-tiger-01-01.jpg?w=400&h=400&auto=compress%2Cformat&fit=crop" }
+];
+
+const fruitsVeggies = [
+  { name:"Egg", img:"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAA...", color:"#FFD700" },
+  { name:"Apple", img:"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAA...", color:"#FF0000" },
+  { name:"Banana", img:"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAA...", color:"#FFE135" },
+  { name:"Carrot", img:"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAA...", color:"#FFA500" }
+];
+
+const dinosaurs = [
+  { name:"T-Rex", img:"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAA...", color:"#FF6F61" },
+  { name:"D-Rex", img:"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAA...", color:"#FF8C00" },
+  { name:"Triceratops", img:"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAA...", color:"#6B5B95" },
+  { name:"Velociraptor", img:"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAA...", color:"#FFA500" }
+];
+
+// Game State
+let gameMode="", currentItem=null, players=[], scores={}, currentPlayerIndex=0;
+
+function selectGame(mode){ 
+    gameMode=mode; 
+    document.getElementById("gameSelection").style.display="none"; 
+    document.getElementById("playerSetup").style.display="block"; 
+}
+
+function startGame(){
+  const input = document.getElementById("playerNames").value;
+  if(!input) return alert("Enter at least one player.");
+  players = input.split(",").map(n=>n.trim());
+  scores={}; players.forEach(p=>scores[p]=0);
+  document.getElementById("playerSetup").style.display="none";
+  document.getElementById("gameArea").style.display="block";
+  document.getElementById("homeBtn").style.display="inline-block";
+  document.getElementById("restartBtn").style.display="none";
+  updateCurrentPlayer();
+  if(gameMode==="wild"){ newItem(wildAnimals); }
+  else if(gameMode==="fruit"){ newItem(fruitsVeggies); }
+  else if(gameMode==="dinosaur"){ newItem(dinosaurs); }
+  updateScoreBoard();
+}
+
+function updateCurrentPlayer(){ document.getElementById("currentPlayer").innerText = players[currentPlayerIndex]; }
+
+function updateScoreBoard(){
+  let board=document.getElementById("scoreBoard"), html="<b>Scores:</b><br>", winner=null;
+  players.forEach(p=>{ html+=p+": "+scores[p]+"<br>"; if(scores[p]>=winningScore && !winner) winner=p; });
+  board.innerHTML = html;
+  if(winner){
+    document.getElementById("result").innerText = `🎉 ${winner.toUpperCase()} WINS! 🎉`;
+    jsConfetti.addConfetti({emojis:['🎉','✅'], emojiSize:50, confettiNumber:150});
+    correctSound.play();
+    document.querySelectorAll(".choice-btn").forEach(b=>b.disabled=true);
+    bgMusic.pause();
+    document.getElementById("restartBtn").style.display="inline-block";
+  }
+}
+
+// 4-choice buttons logic
+function generateButtons(list){
+  const container = document.getElementById("choicesContainer");
+  container.innerHTML = "";
+  let wrongChoices = list.filter(item=>item.name !== currentItem.name);
+  wrongChoices = shuffleArray(wrongChoices).slice(0,3);
+  let choices = [...wrongChoices, currentItem];
+  choices = shuffleArray(choices);
+  choices.forEach(item=>{
+    const btn = document.createElement("button");
+    btn.innerText = item.name;
+    btn.className = "choice-btn";
+    btn.style.backgroundColor = item.color || "#" + Math.floor(Math.random()*16777215).toString(16); // use item.color or random
+    btn.style.color = "#fff";
+    btn.onclick = ()=>checkGuess(item.name,list);
+    container.appendChild(btn);
+  });
+}
+
+function shuffleArray(arr){ return arr.sort(()=>Math.random()-0.5); }
+
+function newItem(list){
+  document.getElementById("result").innerText="";
+  currentItem = list[Math.floor(Math.random()*list.length)];
+  document.getElementById("itemImg").src = currentItem.img;
+  document.getElementById("itemImg").style.display="block";
+  generateButtons(list);
+}
+
+function checkGuess(choice,list){
+  const player = players[currentPlayerIndex];
+  if(choice===currentItem.name){
+    correctSound.play();
+    scores[player]+=1;
+    document.getElementById("result").innerText = "🎉 Correct!";
+    jsConfetti.addConfetti({emojis:['🎉','✅'], emojiSize:50, confettiNumber:50});
+    updateScoreBoard();
+    setTimeout(()=>{ newItem(list); },800);
+  } else {
+    wrongSound.play();
+    document.getElementById("result").innerText = "❌ Wrong!";
+  }
+  currentPlayerIndex=(currentPlayerIndex+1)%players.length;
+  updateCurrentPlayer();
+}
+
+function goHome(){
+  document.getElementById("gameArea").style.display="none";
+  document.getElementById("gameSelection").style.display="block";
+  document.getElementById("playerSetup").style.display="block";
+  document.getElementById("bgSelect").style.display="block";
+  document.getElementById("result").innerText="";
+  document.querySelectorAll(".choice-btn").forEach(b=>b.disabled=false);
+  scores={}; currentPlayerIndex=0; players=[];
+  bgMusic.pause(); bgMusic.currentTime=0;
+  document.getElementById("restartBtn").style.display="none";
+}
+
+function restartGame(){
+  players.forEach(p=>scores[p]=0);
+  currentPlayerIndex=0; updateCurrentPlayer(); updateScoreBoard();
+  document.getElementById("result").innerText="";
+  document.getElementById("restartBtn").style.display="none";
+  document.querySelectorAll(".choice-btn").forEach(b=>b.disabled=false);
+  if(gameMode==="wild"){ newItem(wildAnimals); }
+  else if(gameMode==="fruit"){ newItem(fruitsVeggies); }
+  else if(gameMode==="dinosaur"){ newItem(dinosaurs); }
+  bgMusic.currentTime=0; bgMusic.play();
+}
+</script>
+</body>
+</html>
+
