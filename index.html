@@ -88,34 +88,35 @@ function selectBg(option){
 
 const winningScore = 5;
 
+// Real image URLs
 const wildAnimals = [
-  { name:"Cat", img:"https://upload.wikimedia.org/wikipedia/commons/4/4d/Cat_November_2010-1a.jpg" },
-  { name:"Dog", img:"https://upload.wikimedia.org/wikipedia/commons/d/d9/Collage_of_Nine_Dogs.jpg" },
-  { name:"Lion", img:"https://images.unsplash.com/photo-1592194996308-7b43878e84a6?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=60" },
-  { name:"Tiger", img:"https://transforms.stlzoo.org/production/animals/amur-tiger-01-01.jpg?w=400&h=400&auto=compress%2Cformat&fit=crop" }
+  { name:"Cat", img:"https://upload.wikimedia.org/wikipedia/commons/4/4d/Cat_November_2010-1a.jpg", color:"#FF6F61" },
+  { name:"Dog", img:"https://upload.wikimedia.org/wikipedia/commons/d/d9/Collage_of_Nine_Dogs.jpg", color:"#6B5B95" },
+  { name:"Lion", img:"https://images.unsplash.com/photo-1592194996308-7b43878e84a6?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=60", color:"#FFD700" },
+  { name:"Tiger", img:"https://upload.wikimedia.org/wikipedia/commons/5/56/Tiger.50.jpg", color:"#FFA500" }
 ];
 
 const fruitsVeggies = [
-  { name:"Egg", img:"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAA...", color:"#FFD700" },
-  { name:"Apple", img:"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAA...", color:"#FF0000" },
-  { name:"Banana", img:"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAA...", color:"#FFE135" },
-  { name:"Carrot", img:"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAA...", color:"#FFA500" }
+  { name:"Apple", img:"https://images.unsplash.com/photo-1567306226416-28f0efdc88ce?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=60", color:"#FF0000" },
+  { name:"Banana", img:"https://images.unsplash.com/photo-1574226516831-e1dff420e36b?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=60", color:"#FFE135" },
+  { name:"Carrot", img:"https://images.unsplash.com/photo-1582515073490-d4a6d1db5f7f?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=60", color:"#FFA500" },
+  { name:"Egg", img:"https://images.unsplash.com/photo-1600267168747-267b4e9f5a47?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=60", color:"#FFD700" }
 ];
 
 const dinosaurs = [
-  { name:"T-Rex", img:"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAA...", color:"#FF6F61" },
-  { name:"D-Rex", img:"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAA...", color:"#FF8C00" },
-  { name:"Triceratops", img:"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAA...", color:"#6B5B95" },
-  { name:"Velociraptor", img:"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAA...", color:"#FFA500" }
+  { name:"T-Rex", img:"https://upload.wikimedia.org/wikipedia/commons/1/1a/Tyrannosaurus_Rex_Holotype.jpg", color:"#FF6F61" },
+  { name:"D-Rex", img:"https://upload.wikimedia.org/wikipedia/commons/3/3c/DRex_Dinosaur.png", color:"#FF8C00" },
+  { name:"Triceratops", img:"https://upload.wikimedia.org/wikipedia/commons/9/9d/Triceratops_BW.jpg", color:"#6B5B95" },
+  { name:"Velociraptor", img:"https://upload.wikimedia.org/wikipedia/commons/e/e1/Velociraptor_mongoliensis.png", color:"#FFA500" }
 ];
 
-// Game State
+// Game state
 let gameMode="", currentItem=null, players=[], scores={}, currentPlayerIndex=0;
 
 function selectGame(mode){ 
-    gameMode=mode; 
-    document.getElementById("gameSelection").style.display="none"; 
-    document.getElementById("playerSetup").style.display="block"; 
+  gameMode=mode; 
+  document.getElementById("gameSelection").style.display="none"; 
+  document.getElementById("playerSetup").style.display="block"; 
 }
 
 function startGame(){
@@ -150,7 +151,6 @@ function updateScoreBoard(){
   }
 }
 
-// 4-choice buttons logic
 function generateButtons(list){
   const container = document.getElementById("choicesContainer");
   container.innerHTML = "";
@@ -162,8 +162,7 @@ function generateButtons(list){
     const btn = document.createElement("button");
     btn.innerText = item.name;
     btn.className = "choice-btn";
-    btn.style.backgroundColor = item.color || "#" + Math.floor(Math.random()*16777215).toString(16); // use item.color or random
-    btn.style.color = "#fff";
+    btn.style.backgroundColor = item.color;
     btn.onclick = ()=>checkGuess(item.name,list);
     container.appendChild(btn);
   });
